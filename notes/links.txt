@@ -1,0 +1,11 @@
+http://apbr.org/metrics/viewtopic.php?f=2&t=8176&start=30
+
+abpr explanation
+
+
+
+http://stats.nba.com/stats/playbyplay?GameID=0029700671&StartPeriod=0&EndPeriod=10
+
+http://stats.nba.com/stats/boxscore?GameID=0029700671&StartRange=0&EndRange=10&RangeType=2&StartPeriod=0&EndPeriod=14
+
+http://stats.nba.com/stats/scoreboard/?LeagueID=00&gameDate=12%2F02%2F1997&DayOffset=0
