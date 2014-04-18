@@ -1,6 +1,6 @@
 # NBA Win Probability
 
-The goal of this project is to create a website that shows live winning probabilities of ongoing games.
+The goal of this project is to create a website that shows winning probabilities of for each team in ongoing games.
 
 ##### Listing Games
 
@@ -13,5 +13,6 @@ Code to collect the list of games in an input date range has been completed in R
 * Home Team ID
 * Away Team ID
 * National TV
+* Type (preseason, regular season, all star game, postseason)
 
-This information is stored in a sqlite database. Currently, I need to add a column to the database categorizing each game as preseason, regular season, or postseason.
+This information is stored in a sqlite database.
