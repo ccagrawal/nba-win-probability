@@ -25,6 +25,9 @@ for (i in 1:nrow(unique)) {
                         " AND detail=", unique[i, 'detail'], 
                         ' LIMIT 100;', sep = ''), dbname = 'nba_data.db')
   
+  # Export sample to be analyzed for creating the instructions
+  write.csv(sample, paste('../exports/', unique[i, 'action'], '-', unique[i, 'detail'], '.csv', sep = ''), row.names = FALSE)
+  
   # We don't know if the action is from the home team, neutral, or away team, so merge them all
   sample$merge <- paste(sample$actionHome, sample$actionNeutral, sample$actionAway, sep = '\t')
   
@@ -59,23 +62,7 @@ unique$pattern <- gsub('\t', '', unique$pattern)
 unique$pattern <- gsub('^\\s+|\\s+$', '', unique$pattern)
 write.csv(unique, '../exports/uniqueActions.csv', row.names = FALSE)
 
-# Loop through each combination of action / detail and export a sample
-for (i in 1:nrow(unique)) {
-  
-  # Load 100 actions of that action / detail
-  sample <- sqldf(paste("SELECT actionHome, actionNeutral, actionAway 
-                        FROM actions
-                        WHERE action=", unique[i, 'action'],
-                        " AND detail=", unique[i, 'detail'], 
-                        ' LIMIT 100;', sep = ''), dbname = 'nba_data.db')
-  
-  
-  write.csv(sample, paste('../exports/', unique[i, 'action'], '-', unique[i, 'detail'], '.csv', sep = ''), row.names = FALSE)
-  
-  # Heartbeat
-  cat(i, ' / ', nrow(unique), '\t\t', unique[i, 'action'], '\t', unique[i, 'detail'], '\n', sep = '')
-}
-
+# Load samples for analysis
 sample <- sqldf("SELECT gameID, actionHome, actionNeutral, actionAway 
                 FROM actions
                 WHERE action=11;", dbname = 'nba_data.db')
