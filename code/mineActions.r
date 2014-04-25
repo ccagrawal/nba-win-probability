@@ -1,5 +1,7 @@
+# Scrapes action information from NBA and adds it to the database
+
 library(rjson)
-library(sqldf)
+source('DBInterface.r')
 
 # Input:    Game ID (ex. '0021300359')
 # Output:   Data frame with play-by-play breakdown
@@ -7,14 +9,14 @@ library(sqldf)
 playByPlay <- function(gameID) {
   
   # Create URL and scrape the JSON for the input game
-  url1 <- 'http://stats.nba.com/stats/playbyplay?GameID='  # JSON feed from NBA.com
-  url2 <- '&StartPeriod=0&EndPeriod=0'                # Inputs include start and end (not used)
-  url <- paste(url1, gameID, url2, sep = '')
-  json <- fromJSON(file=url)[[3]]                     # (3) contains the actual info for the game
+  urlNBA1 <- 'http://stats.nba.com/stats/playbyplay?GameID='  # JSON feed from NBA.com
+  urlNBA2 <- '&StartPeriod=0&EndPeriod=0'                 # Inputs include start and end (not used)
+  urlNBA <- paste(urlNBA1, gameID, urlNBA2, sep = '')
+  json <- fromJSON(file=urlNBA)[[3]]                      # (3) contains the actual info for the game
   
   # Check if plays exist for the given game
-  temp <- json[[1]]                                   # (1) contains play by play data
-  plays <- temp[[3]]                                  # (3) contains the actual rows
+  temp <- json[[1]]                                       # (1) contains play by play data
+  plays <- temp[[3]]                                      # (3) contains the actual rows
   
   if (length(plays) > 0) {
     
@@ -36,45 +38,12 @@ playByPlay <- function(gameID) {
   }
 }
 
-# Input:    None
-# Output:   Data frame of games from database
-readGames <- function() {
-  # Initialize database connection
-  con <- dbConnect(drv = SQLite(), dbname = "nba_data.db")
-  
-  games <- dbReadTable(con, 'games')
-  return(games)
-}
-
-# Input:    None
-# Output:   Data frame of actions from database
-readActions <- function() {
-  # Initialize database connection
-  con <- dbConnect(drv = SQLite(), dbname = "nba_data.db")
-  
-  actions <- dbReadTable(con, 'actions')
-  return(actions)
-}
-
 # Input:    Data frame of games
 # Output:   None -- database updated with plays
 insertPlays <- function(games) {
-  # Initialize database connection and make table
-  con <- dbConnect(drv = SQLite(), dbname = "nba_data.db")
-  dbSendQuery(conn = con,
-              "CREATE TABLE IF NOT EXISTS actions(
-              gameID VARCHAR(255) NOT NULL, 
-              action INT UNSIGNED, 
-              detail INT UNSIGNED, 
-              quarter INT UNSIGNED, 
-              time VARCHAR(255), 
-              actionHome VARCHAR(255), 
-              actionNeutral VARCHAR(255), 
-              actionAway VARCHAR(255), 
-              score VARCHAR(255), 
-              margin VARCHAR(255),
-              FOREIGN KEY(gameID) REFERENCES games(gameID)
-              );")
+  
+  # Create table in database (won't do anything if table already exists)
+  createActions()
   
   # Insert all actions
   for (row in 1:nrow(games)) {
@@ -83,7 +52,7 @@ insertPlays <- function(games) {
     
     # Only insert if plays were available (duh)
     if (length(plays) > 0) {
-      dbWriteTable(con, name = 'actions', value = plays, row.names = 0, append = TRUE)
+      writeTable('actions', plays)
     }
     
     # Backup every 50 games

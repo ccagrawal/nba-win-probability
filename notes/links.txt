@@ -4,11 +4,7 @@ abpr explanation
 
 
 
-<<<<<<< HEAD
-http://stats.nba.com/stats/playbyplay?GameID= 0021300010&StartPeriod=0&EndPeriod=10
-=======
-http://stats.nba.com/stats/playbyplay?GameID=0029700671&StartPeriod=0&EndPeriod=10
->>>>>>> ac1e6de482f2bec82931088cd85e0796ed74e818
+http://stats.nba.com/stats/playbyplay?GameID=0021300010&StartPeriod=0&EndPeriod=10
 
 http://stats.nba.com/stats/boxscore?GameID=0029700671&StartRange=0&EndRange=10&RangeType=2&StartPeriod=0&EndPeriod=14
 
