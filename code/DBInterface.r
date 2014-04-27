@@ -32,6 +32,12 @@ createActions <- function(dbName = 'nba_data.db') {
   runQuery(sql, dbName)
 }
 
+indexActions <- function(dbName = 'nba_data.db') {
+  sql <- "CREATE INDEX IF NOT EXISTS gameIDIndex
+          ON actions (gameID)"
+  runQuery(sql, dbName)
+}
+
 createInstructions <- function(dbName = 'nba_data.db') {
   sql <- "CREATE TABLE IF NOT EXISTS instructions(
           action INT UNSIGNED, 
@@ -53,6 +59,12 @@ createTimelines <- function(dbName = 'nba_data.db') {
           margin TINYINT, 
           FOREIGN KEY(gameID) REFERENCES games(gameID)
           );"
+  runQuery(sql, dbName)
+}
+
+indexTimelines <- function(dbName = 'nba_data.db') {
+  sql <- "CREATE INDEX IF NOT EXISTS inputsIndex
+          ON timelines (time, possession, margin, type)"
   runQuery(sql, dbName)
 }
 

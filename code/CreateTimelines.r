@@ -68,11 +68,17 @@ convertActions <- function(actions) {
       # Fill in margin
       timeline[row, 'margin'] <- filtered[i, 'margin']
       
+      # Shift rowBefore
+      rowBefore <- row
+      
     } else if (row == 1) {    # Game start
       
       # Mark possession after
       timeline[row:(rowAfter - 1), 'possession'] <- possAfter
       
+      # Shift rowBefore
+      rowBefore <- row
+
     } else {                  # Game end
       
       # If no possession is marked before, mark it
@@ -80,17 +86,23 @@ convertActions <- function(actions) {
       if (timeline[row - 1, 'possession'] == 0) {
         timeline[rowBefore:(row - 1), 'possession'] <- possBefore
       } else if ((timeline[row - 1, 'possession'] != possBefore) && (possBefore != 0)) {
-        errors <- c(errors, row)
+        timeline[rowBefore:(row - 1), 'possession'] <- 0
       }
       
+      # Fill in margin
+      timeline[nrow(timeline), 'margin'] <- filtered[i, 'margin']
+      
+      # Shift rowBefore
+      rowBefore <- nrow(timeline)
     }
-    
-    # Shift rowBefore
-    rowBefore <- row
   }
   
   # Fill down margin
   timeline$margin <- na.locf(timeline$margin, na.rm = FALSE)
+  
+  # Add gameID and remove Checkpoint
+  timeline$gameID <- actions[1, 'gameID']
+  timeline <- timeline[, c('gameID', 'time', 'possession', 'margin')]
   
   return(timeline)
 }
@@ -173,7 +185,7 @@ timeElapsed <- function(period, rem) {
 
 # Input:   Games data frame
 # Output:  Nothing -- database updated with timelines
-insertTimelines(games) {
+insertTimelines <- function(games) {
   
   # Create table in database (won't do anything if table already exists)
   createTimelines()
@@ -181,15 +193,16 @@ insertTimelines(games) {
   # Insert all actions
   for (row in 1:nrow(games)) {
     gameID <- games[row, 'gameID']
-    plays <- playByPlay(gameID)
+    actions <- readActions(gameID)
     
-    # Only insert if plays were available (duh)
-    if (length(plays) > 0) {
-      writeTable('actions', plays)
+    # Skip games with 0 actions (preseason)
+    if (nrow(actions) > 0) {
+      timeline <- convertActions(actions)
+      writeTable('timelines', timeline)
     }
     
-    # Backup every 50 games
-    if (row %% 50 == 0) {
+    # Backup every 200 games
+    if (row %% 200 == 0) {
       file.copy('nba_data.db', 'backup_nba_data.db', overwrite = TRUE)
     }
     
