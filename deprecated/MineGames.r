@@ -11,10 +11,10 @@ source('DBInterface.r')
 gamesDay <- function(rawDate) {
   
   # Create NBA URL and scrape the JSON for the input day
-  rawDate <- as.Date(rawDate)
-  urlNBA1 <- 'http://stats.nba.com/stats/scoreboard/?LeagueID=00&gameDate='
-  urlNBA2 <- '&DayOffset=0'                           # No need for day offset
-  date <- format(rawDate, format = '%m%%2F%d%%2F%Y')  # NBA.com uses a weird date format: "mm%2Fdd%2FYYYY"
+  rawDate <- as.Date(rawDate)                         # Clean date input
+  urlNBA1 <- 'http://stats.nba.com/stats/scoreboard/?LeagueID=00&gameDate='  # JSON feed from NBA.com
+  urlNBA2 <- '&DayOffset=0'                           # Inputs include date and offset (not used)
+  date <- format(rawDate, format = '%m%%2F%d%%2F%Y')  # Format date to be used in URL "mm%2Fdd%2FYYYY"
   urlNBA <- paste(urlNBA1, date, urlNBA2, sep = '')
   json <- fromJSON(file=urlNBA)[[3]]                  # (3) contains the actual info for the day
   
